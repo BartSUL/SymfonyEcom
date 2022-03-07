@@ -11,8 +11,13 @@ class IndexController extends AbstractController
     #[Route('/', name: 'app_index')]
     public function index(): Response
     {
+        $products = [];
+        for($i=0; $i < 2; $i++){
+            array_push($products, ['name' => uniqid()]);
+        }
+
         return $this->render('index/index.html.twig', [
-            'controller_name' => 'IndexController',
+            'products' => $products,
         ]);
     }
 }
