@@ -29,6 +29,27 @@ class Product
     #[ORM\JoinColumn(nullable:true)]
     private $category;
 
+    #[ORM\Column(type: 'integer')]
+    public function getThumbnail(){
+        //Cette méthode rend une vignette différente selon la Catégorie (ou l'absence) du Product
+        if($this->getCategory()){
+            switch($this->getCategory()->getName()){
+                case "Chaise":
+                    return "placeholder_chaise.jpg";
+                case "Bureau":
+                    return "placeholder_bureau.jpg";
+                case "Lit":
+                    return "placeholder_lit.jpg";
+                case "Canape":
+                    return "placeholder_canape.jpg";
+                case "Armoire":
+                    return "placeholder_armoire.jpg";
+                default;
+                    return  "placeholder_aucun.jpg";
+            }
+        }else return  "placeholder_aucun.jpg";
+    }
+
     public function getId(): ?int
     {
         return $this->id;

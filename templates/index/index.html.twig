@@ -14,7 +14,7 @@
       {% for product in products %}
         <div class="w3-third">
           <p>{{ product.name }}</p>
-          <img src="{{ asset('assets/img/placeholder_aucun.jpg') }}" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+          <img src="{{ asset('assets/img/' ~ product.thumbnail) }}" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
         </div>
       {% endfor %}
     </div>
