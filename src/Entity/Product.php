@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Tag;
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -29,6 +32,15 @@ class Product
     #[ORM\JoinColumn(nullable:true)]
     private $category;
 
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Tag', inversedBy:'products')]
+    #[ORM\JoinColumn(nullable:true)]
+    private $tags;
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
+    
     #[ORM\Column(type: 'integer')]
     public function getThumbnail(){
         //Cette méthode rend une vignette différente selon la Catégorie (ou l'absence) du Product
@@ -45,7 +57,7 @@ class Product
                 case "Armoire":
                     return "placeholder_armoire.jpg";
                 default;
-                    return  "placeholder_aucun.jpg";
+                    return "placeholder_aucun.jpg";
             }
         }else return  "placeholder_aucun.jpg";
     }
@@ -111,6 +123,30 @@ class Product
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): self
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): self
+    {
+        $this->tags->removeElement($tag);
 
         return $this;
     }
