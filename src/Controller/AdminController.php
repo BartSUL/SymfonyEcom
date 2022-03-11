@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use de;
 use App\Entity\Tag;
 use App\Form\TagType;
 use App\Entity\Product;
@@ -59,8 +58,15 @@ class AdminController extends AbstractController
             if($product->getPrice() >= 1){
                 $entityManager->persist($product);
                 $entityManager->flush();
+                $request->getSession()->set('message_title', 'Création de Produit');
+                $this->addFlash('info', 'Le Produit a été créé avec succès.');
+                $request->getSession()->set('status', 'green');
+                return $this->redirectToRoute('admin_backoffice');
+            } else {
+                $request->getSession()->set('message_title', 'Achat');
+                $this->addFlash('info', 'Veuillez indiquer un prix supérieur à 1€.');
+                $request->getSession()->set('status', 'red');
             }
-            return $this->redirectToRoute('admin_backoffice');
         }
         //Si le formulaire n'est pas rempli, nous le présentons à l'utilisateur
         return $this->render('index/dataform.html.twig', [
@@ -83,6 +89,9 @@ class AdminController extends AbstractController
         //Nous recherchons le Product désiré via une recherche avec l'ID noté dans l'URL, si la recherche n'aboutit pas, nous revenons au backoffice administrateur
         $product = $productRepository->find($productId);
         if(!$product){
+            $request->getSession()->set('message_title', 'Modification de Produit');
+            $this->addFlash('info', 'Le Produit indiqué n\'existe pas.');
+            $request->getSession()->set('status', 'red');
             return $this->redirectToRoute('admin_backoffice');
         }
         $productForm = $this->createForm(ProductType::class, $product);
@@ -93,8 +102,15 @@ class AdminController extends AbstractController
             if($product->getPrice() >= 1){
                 $entityManager->persist($product);
                 $entityManager->flush();
+                $request->getSession()->set('message_title', 'Modification de Produit');
+                $this->addFlash('info', 'Le Produit a été modifié avec succès.');
+                $request->getSession()->set('status', 'green');
+                return $this->redirectToRoute('admin_backoffice');
+            } else {
+                $request->getSession()->set('message_title', 'Modification de Produit');
+                $this->addFlash('info', 'Veuillez indiquer un prix supérieur à 1€.');
+                $request->getSession()->set('status', 'red');
             }
-            return $this->redirectToRoute('admin_backoffice');
         }
         //Si le formulaire n'est pas rempli, nous le présentons à l'utilisateur
         return $this->render('index/dataform.html.twig', [
@@ -105,7 +121,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/product/delete/{productId}', name: 'product_delete')]
-    public function deleteProduct(ManagerRegistry $managerRegistry, int $productId = 0): Response
+    public function deleteProduct(Request $request, ManagerRegistry $managerRegistry, int $productId = 0): Response
     {
         //Cette méthode supprime de la base de données une Entity dont l'ID a été renseigné dans notre URL
         //Afin de pouvoir récupérer le Product en question de notre base de données, nous avons besoin de l'Entity Manager et du Repository pertinent
@@ -114,11 +130,17 @@ class AdminController extends AbstractController
         //Nous récupérons le Product en question, s'il n'est pas trouvé nous retournons à l'index
         $product = $productRepository->find($productId);
         if(!$product){
+            $request->getSession()->set('message_title', 'Suppression de Produit');
+            $this->addFlash('info', 'Le Produit indiqué n\'existe pas.');
+            $request->getSession()->set('status', 'red');
             return $this->redirectToRoute('admin_backoffice');
         }
         //Si le Product est trouvé, nous procédons à sa suppression avant de retourner sur notre Backoffice Administrateur:
         $entityManager->remove($product);
         $entityManager->flush();
+        $request->getSession()->set('message_title', 'Suppression de Produit');
+        $this->addFlash('info', 'Le Produit a été supprimé avec succès.');
+        $request->getSession()->set('status', 'green');
         return $this->redirectToRoute('admin_backoffice');
     }
 
@@ -190,6 +212,9 @@ class AdminController extends AbstractController
                     $entityManager->persist($tag);
                 }
             }
+            $request->getSession()->set('message_title', 'Création de Tags');
+            $this->addFlash('info', 'Les Tags renseignés ont été créés avec succès.');
+            $request->getSession()->set('status', 'green');
             $entityManager->flush(); //On applique toutes les demandes de persistance
             //On retourne ensuite au backoffice
             return $this->redirectToRoute('admin_backoffice');
@@ -214,15 +239,20 @@ class AdminController extends AbstractController
         //Nous recherchons le Tag désiré via une recherche avec l'ID noté dans l'URL, si la recherche n'aboutit pas, nous revenons au backoffice administrateur
         $tag = $tagRepository->find($tagId);
         if(!$tag){
+            $request->getSession()->set('message_title', 'Modification de Tag');
+            $this->addFlash('info', 'Le Tag indiqué n\'existe pas.');
+            $request->getSession()->set('status', 'red');
             return $this->redirectToRoute('admin_backoffice');
         }
         $tagForm = $this->createForm(TagType::class, $tag);
         //Nous appliquons les valeurs de notre Request, et si le formulaire est valide, nous l'envoyons vers notre base de données
         $tagForm->handleRequest($request);
         if($request->isMethod('post') && $tagForm->isValid()){
-            //On vérifie que le prix indiqué pour notre produit est égal ou supérieur à 1
             $entityManager->persist($tag);
             $entityManager->flush();
+            $request->getSession()->set('message_title', 'Modification de Tag');
+            $this->addFlash('info', 'Le Tag a été modifié avec succès.');
+            $request->getSession()->set('status', 'green');
             return $this->redirectToRoute('admin_backoffice');
         }
         //Si le formulaire n'est pas rempli, nous le présentons à l'utilisateur
@@ -234,7 +264,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/tag/delete/{tagId}', name: 'tag_delete')]
-    public function deleteTag(ManagerRegistry $managerRegistry, int $tagId = 0): Response
+    public function deleteTag(Request $request, ManagerRegistry $managerRegistry, int $tagId = 0): Response
     {
         //Cette méthode supprime de la base de données une Entity dont l'ID a été renseigné dans notre URL
         //Afin de pouvoir récupérer le Tag en question de notre base de données, nous avons besoin de l'Entity Manager et du Repository pertinent
@@ -243,12 +273,19 @@ class AdminController extends AbstractController
         //Nous récupérons le Tag en question, s'il n'est pas trouvé nous retournons à l'index
         $tag = $tagRepository->find($tagId);
         if(!$tag){
+            $request->getSession()->set('message_title', 'Suppression de Tag');
+            $this->addFlash('info', 'Le Tag indiqué n\'existe pas.');
+            $request->getSession()->set('status', 'red');
             return $this->redirectToRoute('admin_backoffice');
         }
         //Si le Tag est trouvé, nous procédons à sa suppression avant de retourner sur notre Backoffice Administrateur:
         $entityManager->remove($tag);
         $entityManager->flush();
+        $request->getSession()->set('message_title', 'Suppression de Tag');
+        $this->addFlash('info', 'Le Tag a été supprimé avec succès.');
+        $request->getSession()->set('status', 'green');
         return $this->redirectToRoute('admin_backoffice');
     }
 
 }
+

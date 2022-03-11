@@ -22,6 +22,14 @@
 <!-- Page content -->
 <div class="w3-content" style="max-width:2000px;margin-top:46px">
 
+  {# Un flashbag c'est un message supprimé après affichange. Notre boucle for ici, chargée à chaque utilisation de base.html.twig permet d'afficher le en évidance #}
+  {% for message in app.session.flashbag.get('info') %}
+    <div class="w3-panel w3-pale-{{ app.session.get('status') }}" styele="max-width:800px; margin:auto; ">
+      <h3>{{ app.session.get('message_title') }}</h3>
+      <p>{{ message }}</p>
+    </div>
+  {% endfor %}
+
   {% block body %}{% endblock %}
 
   <!-- The Tour Section -->

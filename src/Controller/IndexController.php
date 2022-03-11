@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Entity\Category;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -87,7 +88,7 @@ class IndexController extends AbstractController
     }
 
     #[Route('/product/buy/{productId}', name: 'product_buy')]
-    public function buyProduct(int $productId = 0, ManagerRegistry $managerRegistry): Response
+    public function buyProduct(int $productId = 0, Request $request, ManagerRegistry $managerRegistry): Response
     {
         //Cette méthode décremente notre Product désigné vie l'ID renseigné dans notre base de donnée de 1.
         //Afin de pouvoir dialoguer avec notre base de donnée et récoupérer le Product dont nous désirons décrémenter le stock, nous avons besoin de l'etinity Manager ainsi que du Reposiroty pertinent:
@@ -103,10 +104,18 @@ class IndexController extends AbstractController
         if($productStock > 0){
             $productStock -= 1;
             $product->setStock($productStock);
+            $request->getSession()->set('message_title', 'Achat');
+            $this->addFlash('info', 'Votre achat a bien été effectué.');
+            $request->getSession()->set('status', 'green');
+        } else {
+            $request->getSession()->set('message_title', 'Achat');
+            $this->addFlash('info', 'Le produit est en rupture de stock.');
+            $request->getSession()->set('status', 'yellow');
         }
         //Nous persistons notre Product, avant de retourner sur la fiche Product pertinente
         $entityManager->persist($product);
         $entityManager->flush();
+        //On affiche notre produit
         return $this->redirectToRoute('product_display', [
             'productId' => $product->getId(),
         ]);
