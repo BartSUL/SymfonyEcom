@@ -1,60 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminController!
-{% endblock %}
+{% block title %}Hello AdminController!{% endblock %}
 
 {% block body %}
-	{# Section Backoffice Admin #}
-	<div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="form">
-		<h1>Backoffice Administrateur</h1>
+    <!-- Section Backoffice Admin -->
+    <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="backoffice">
+        <h1>Backoffice Administrateur</h1>
 
-		<a hredf="{{ path('product_create') }}" class="w3-button w3-red" role="button">Créer Produit</a>
-        <a hredf="{{ path('tag_create') }}" class="w3-button w3-green" role="button">Créer Tag</a>
+        <a href="{{ path('product_create') }}" class="w3-button w3-red" role="button">Créer Produit</a>
+        <a href="{{ path('tag_create') }}" class="w3-button w3-green" role="button">Créer Tag</a>
 
 
-		<h2 class="w3-wide" style="margin-top:50px;">Liste des Produits</h2>
+        <h2 class="w3-wide" style="margin-top:50px">Liste des Produits</h2>
+    
+        {% if products is not empty %}
+            <ul class="w3-ul w3-border" style="margin-top:20px">
+                {% for product in products %}
+                <li class="w3-padding">
+                    <p>
+                        <b>{{ product.name }}</b> : 
+                        {% if product.category is defined %}
+                            {{ product.category.name }}
+                        {% else %}
+                            Non catégorisé
+                        {% endif %}
+                        <a href="{{ path('product_delete', {'productId' : product.id}) }}" class="w3-button w3-red" style="float:right;" role="button">Supprimer</a>
+                        <a href="{{ path('product_update', {'productId' : product.id}) }}" class="w3-button w3-blue-gray" style="float:right;" role="button">Modifier</a>
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><b>Il n'y a aucun Produit à afficher.</b></p>
+        {% endif %}
 
-		{% if products is not empty %}
-			<ul class="w3-ul w3-border" style="margin-top:20px">
-				{% for product in products %}
-					<li class="w3-padding">
-						<p>
-							<b>{{ product.name }}</b>
-							:
-							{% if product.category is defined %}
-								{{ product.category.name }}
-							{% else %}
-								Non catégorisé
-							{% endif %}
-							<a hredf="{{ path('product_delete', {'productId' : product.id}) }}"  class="w3-button w3-red" style="float:right;" role="button">Supprimer</a>
 
-							<a href="{{ path('product_update', {'productId' : product.id}) }}" class="w3-button w3-blue-gray" style="float:right;" role="button">Modifier</a>
+        <h2 class="w3-wide" style="margin-top:50px">Liste des Tags</h2>
+    
+        {% if tags is not empty %}
+            <ul class="w3-ul w3-border" style="margin-top:20px">
+                {% for tag in tags %}
+                <li class="w3-padding">
+                    <p>
+                        <b>{{ tag.name }}</b> : 
+                        <a href="{{ path('tag_delete', {'tagId' : tag.id}) }}" class="w3-button w3-red" style="float:right;" role="button">Supprimer</a>
+                        <a href="{{ path('tag_update', {'tagId' : tag.id}) }}" class="w3-button w3-blue-gray" style="float:right;" role="button">Modifier</a>
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><b>Il n'y a aucun Tag à afficher.</b></p>
+        {% endif %}
 
-						</p>
-					</li>
-				{% endfor %}
-			</ul>
-		{% else %}
-			<p><b>Il n'y a aucun Prodit à afficher</b></p>
-		{% endif %}
-
-        <h2 class="w3-wide" style="margin-top:50px;">Liste des Tag</h2>
-
-		{% if tags is not empty %}
-			<ul class="w3-ul w3-border" style="margin-top:20px">
-				{% for tag in tags %}
-					<li class="w3-padding">
-						<p>
-							<b>{{ tag.name }}</b>
-							<a hredf="{{ path('tag_delete', {'tagId' : tag.id}) }}"  class="w3-button w3-red" style="float:right;" role="button">Supprimer</a>
-							<a href="{{ path('tag_update', {'tagId' : tag.id}) }}" class="w3-button w3-blue-gray" style="float:right;" role="button">Modifier</a>
-                        </p>
-					</li>
-				{% endfor %}
-			</ul>
-		{% else %}
-			<p><b>Il n'y a aucun Tag à afficher</b></p>
-		{% endif %}
-        
-	</div>
+    </div>
 {% endblock %}

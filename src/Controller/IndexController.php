@@ -64,7 +64,7 @@ class IndexController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{productId}', name: 'product_display')]
+    #[Route('/product/display/{productId}', name: 'product_display')]
     public function displayProduct(int $productId, ManagerRegistry $managerRegistry): Response
     {
         //Cette méthode affiche les informations relatives à une instance d'Entity de type Product dont l'ID correspond à la valeur du paramètre de route indiquée dans notre URL
@@ -86,7 +86,29 @@ class IndexController extends AbstractController
         ]);
     }
 
-    
-
+    #[Route('/product/buy/{productId}', name: 'product_buy')]
+    public function buyProduct(int $productId = 0, ManagerRegistry $managerRegistry): Response
+    {
+        //Cette méthode décremente notre Product désigné vie l'ID renseigné dans notre base de donnée de 1.
+        //Afin de pouvoir dialoguer avec notre base de donnée et récoupérer le Product dont nous désirons décrémenter le stock, nous avons besoin de l'etinity Manager ainsi que du Reposiroty pertinent:
+        $entityManager = $managerRegistry->getManager();
+        $productRepository = $entityManager->getRepository(Product::class);
+        //Nous récouperons le Product dont l'ID est spécifié dans l'URL. Si ce Product n'est pas trouvé, nous retournons à l'index
+        $product = $productRepository->find($productId);
+        if(!$product ){
+            return $this->redirectToRoute('app_index');
+        }
+        //Si nous avons récoupérer notre Product, nous décrementons son stock de 1, A CONDITION que ce dernier soit supérieur à 0
+        $productStock = $product->getStock();
+        if($productStock > 0){
+            $productStock -= 1;
+            $product->setStock($productStock);
+        }
+        //Nous persistons notre Product, avant de retourner sur la fiche Product pertinente
+        $entityManager->persist($product);
+        $entityManager->flush();
+        return $this->redirectToRoute('product_display', [
+            'productId' => $product->getId(),
+        ]);
+    }
 }
-

@@ -33,7 +33,9 @@
             <p class="w3-opacity">Stock: {{ product.stock }} unités disponibles</p>
             <p class="w3-opacity">Prix: {{ product.price|number_format(2, ',') }}€</p>
             <p>{{ product.description }}</p>
-            <button class="w3-button w3-black">Acheter</button>
+            {% if product.stock > 0 %}
+              <a href="{{ path('product_buy', {'productId' : product.id}) }}" type="button" class="w3-button w3-black">Acheter</a>
+            {% endif %}
           </div>
         </div>
       </div>
